@@ -29,30 +29,39 @@ for ascii_code = 65, 90 do -- Uppercase ASCII letters
 end
 
 local function format(to_format, arg) -- Essentially string.format but it lets you only format one part of a string
-    local args = {arg}
-    for i = 2, (letters_left + 1) do
-        args[i] = "%s"
+    if letters_left > 0 then -- Is this more optimized? I'm not quite sure..
+      local args = {arg}
+      for i = 2, (letters_left + 1) do
+          args[i] = "%s"
+      end
+      return to_format:format(table.unpack(args))
+  else
+      return to_format:format(arg)
     end
-    return to_format:format(table.unpack(args))
 end
-local function loop(format_string)
+local function loop(format_string, storage_table)
     letters_left = (letters_left - 1)
      for _, letter in ipairs(alphabet) do
         local new_string = format(format_string, letter)
         if letters_left > 0 then
-            loop(new_string)
+            loop(new_string, storage_table)
             letters_left = (letters_left + 1)
         else
-            print(new_string) -- Printing the result at the end
+            storage_table[#storage_table + 1] = new_string -- The final result
         end
     end    
 end
 
 
-local function Generate(word)
-    loop(word)
-    letters_left = (letters_left + 1) -- Setting it back to the original value
-    print(string.format("Ran %i times.", (#alphabet)^letters_left))
+local function GenerateCombinations(word) -- Will return us an array filled with all possible string combinations
+    local storage_table = {}
+    loop(word, storage_table)
+    letters_left = (letters_left + 1) -- Setting it back to the original value. Not really needed, but I'll leave it in
+    return storage_table
 end
 
-Generate(usable_word)
+local combinations = GenerateCombinations(usable_word)
+for _, combination in ipairs(combinations) do
+    print(combination)
+end
+print(string.format("Generated %i combinations.", #combinations))
