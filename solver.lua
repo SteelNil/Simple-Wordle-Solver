@@ -43,7 +43,7 @@ local function loop(format_string)
             loop(new_string)
             letters_left = (letters_left + 1)
         else
-            print(new_string)
+            print(new_string) -- Printing the result at the end
         end
     end    
 end
